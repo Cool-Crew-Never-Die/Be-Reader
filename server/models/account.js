@@ -9,12 +9,12 @@ const Account = new Schema({
   created: { type: Date, default: Date.now }
 });
 
-// generates hash
+// 해시 생성
 Account.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, 8);
 };
 
-// compares the password
+// 비밀번호 비교
 Account.methods.validateHash = function(password) {
   return bcrypt.compareSync(password, this.password);
 };

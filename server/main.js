@@ -1,3 +1,4 @@
+/* server의 메인 고치는 중 */
 import express from "express";
 import path from "path";
 import mongoose from "mongoose";

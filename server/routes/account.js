@@ -4,7 +4,7 @@ import Account from "../models/account";
 const router = express.Router();
 
 /*
-  ACCOUNT SIGNUP: POST /api/account/signup
+  회원가입: POST /api/account/signup
   BODY SAMPLE: { "username": "test", "password": "test" }
   ERROR CODES:
     1: BAD USERNAME
@@ -13,7 +13,7 @@ const router = express.Router();
 */
 
 router.post("/signup", (req, res) => {
-  // CHECK USERNAME FORMAT
+  // USERNAME 정규 표현식으로 체크
   let usernameRegex = /^[a-z0-9]+$/;
 
   if (!usernameRegex.test(req.body.username)) {
@@ -23,7 +23,7 @@ router.post("/signup", (req, res) => {
     });
   }
 
-  // CHECK PASS LENGTH
+  // 비밀번호 길이 비교
   if (req.body.password.length < 4 || typeof req.body.password !== "string") {
     return res.status(400).json({
       error: "BAD PASSWORD",
@@ -31,7 +31,7 @@ router.post("/signup", (req, res) => {
     });
   }
 
-  // CHECK USER EXISTANCE
+  // USER 정보 체크
   Account.findOne({ username: req.body.username }, (err, exists) => {
     if (err) throw err;
     if (exists) {
@@ -41,7 +41,7 @@ router.post("/signup", (req, res) => {
       });
     }
 
-    // CREATE ACCOUNT
+    // 계정 생성
     let account = new Account({
       username: req.body.username,
       password: req.body.password
@@ -49,7 +49,7 @@ router.post("/signup", (req, res) => {
 
     account.password = account.generateHash(account.password);
 
-    // SAVE IN THE DATABASE
+    // DB에 저장
     account.save(err => {
       if (err) throw err;
       return res.json({ success: true });
@@ -58,13 +58,13 @@ router.post("/signup", (req, res) => {
 });
 
 /*
-  ACCOUNT SIGNIN: POST /api/account/signin
+  로그인: POST /api/account/login
   BODY SAMPLE: { "username": "test", "password": "test" }
   ERROR CODES:
     1: LOGIN FAILED
 */
 
-router.post("/signin", (req, res) => {
+router.post("/login", (req, res) => {
   if (typeof req.body.password !== "string") {
     return res.status(401).json({
       error: "LOGIN FAILED",
@@ -72,7 +72,7 @@ router.post("/signin", (req, res) => {
     });
   }
 
-  // FIND THE USER BY USERNAME
+  // USERNAME 으로 USER 찾기
   Account.findOne({ username: req.body.username }, (err, account) => {
     if (err) throw err;
 
@@ -107,7 +107,7 @@ router.post("/signin", (req, res) => {
 });
 
 /*
-  GET CURRENT USER INFO GET /api/account/getInfo
+  현재 USER 정보 가져오기: GET /api/account/getInfo
 */
 router.get("/getinfo", (req, res) => {
   if (typeof req.session.loginInfo === "undefined") {
@@ -120,7 +120,7 @@ router.get("/getinfo", (req, res) => {
 });
 
 /*
-  LOGOUT: POST /api/account/logout
+  로그아웃: POST /api/account/logout
 */
 router.post("/logout", (req, res) => {
   req.session.destroy(err => {
